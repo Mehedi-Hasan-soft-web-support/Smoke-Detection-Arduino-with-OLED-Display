@@ -11,6 +11,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 // Pin configuration
 const int smokeSensorPin = A1;    // MQ-2 sensor connected to analog pin A1
 const int threshold = 200;        // Threshold value for smoke detection
+const int buzzerPin = 8;          // Buzzer connected to pin 8
 
 void setup() {
   Serial.begin(115200);
@@ -22,28 +23,21 @@ void setup() {
   }
 
   // Clear the display
- // Display "Smoke Monitoring System" at startup
-display.clearDisplay();
+  display.clearDisplay();
 
-// Draw a graphical header
-display.fillRect(0, 0, SCREEN_WIDTH, 16, WHITE); // Filled rectangle for header
-display.setTextSize(1);
-display.setTextColor(BLACK); // Invert text color for the header
-display.setCursor(1, 1);
- 
-
-display.println("SMOKE MONITORING SYSTEM");  
-
-
-
-// Display the content on the OLED
-display.display();
-delay(3000); // Hold the message for 3 seconds
-
+  // Display "Smoke Monitoring System" at startup
+  display.fillRect(0, 0, SCREEN_WIDTH, 16, WHITE); // Filled rectangle for header
+  display.setTextSize(1);
+  display.setTextColor(BLACK); // Invert text color for the header
+  display.setCursor(1, 1);
+  display.println("SMOKE MONITORING SYSTEM");
 
   // Display the content on the OLED
   display.display();
   delay(3000); // Hold the message for 3 seconds
+
+  // Initialize buzzer pin as output
+  pinMode(buzzerPin, OUTPUT);
 }
 
 void loop() {
@@ -58,10 +52,13 @@ void loop() {
 
   if (smokeValue >= threshold) {
     display.println("Smoke Detected!");
+    digitalWrite(buzzerPin, HIGH);  // Turn on the buzzer
   } else {
     display.println("You are:\n Safe");
+    digitalWrite(buzzerPin, LOW);   // Turn off the buzzer
   }
 
+  // Display the updated content on the OLED
   display.display();
   delay(1000); // 1-second delay between readings
 }
